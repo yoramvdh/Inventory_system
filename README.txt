@@ -28,7 +28,7 @@ If your project has a lot of features, list them here.
 ---
 ## Credits
 
-The project was realized with the help of Rob Rob Vanden Broucke and Dr B.Lelie
+The project was realized with the help of ir Rob Vanden Broucke and Dr B.Lelie
 
 For the project GitHub desktop, Google App Scripts, Visual Studio Code, Eslint and Clasp.
 
