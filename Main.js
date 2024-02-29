@@ -10,13 +10,14 @@
 
 /* Declaration*/
 
-let row = 3; // begin van de tabel
+let row = 2; // start of the table
 // Get SpreadsheetUrl
 const sheetUrl = SpreadsheetApp.getActive().getUrl();
 // Get all the sheets
 const sheets = SpreadsheetApp.getActive().getSheets();
 const voorraadbeheer = sheets[0];
-const vervallenReagentia = sheets[1];
+const vervallenReagentia = sheets[3];
+const opgebruikteReagentia = sheets[2];
 
 // Create array to store all the links
 const links = [];
@@ -24,7 +25,7 @@ const links = [];
 // string of the URL for that sheet
 sheets.forEach((sheet)=>links.push(sheetUrl+'#gid='+sheet.getSheetId()));
 const voorraadbeheerlink = links[0];
-const vervallenReagentialink = links[2];
+const vervallenReagentialink = links[3];
 
 const range = voorraadbeheer.getRange('A3:01100');
 
@@ -66,6 +67,54 @@ function expiredProduct() {
     currentcell = voorraadbeheer.getRange(row, 1).getValue();
   }
   range.sort(7); // Sort complete range based on column.
+}
+
+// This function uses a trigger to find all product who are almoust expired and send a mail to specifiek users
+function almoustExpiredProducts() {
+  const almoustexpired = 14; // number of day befor the product expires
+  let currentcell = voorraadbeheer.getRange(row, 1).getValue();
+
+  // As long as the currentcell is not empty the function goes over the table and will compare each time the expirationdate with the number of days till it expires.
+
+  while ( currentcell != '') {
+    const expiredate = voorraadbeheer.getRange(row, 9).getValue();
+    const alreadyused =voorraadbeheer.getRange(row, 11).getValue();
+    if (expiredate == almoustexpired && alreadyused === '' ) { // Checks if the product is almost expired.
+      // Sends a mail to the user.
+      MailApp.sendEmail({to: 'yoram.vandenhouwe@azzenopathologie.net',
+        subject: 'automatische mail- Bijna Vervallen product',
+        htmlBody: 'Het product '+currentcell+' op rij '+row+' zal over 14 dagen vervallen.'+ voorraadbeheerlink,
+      });
+    }
+    row = row +1; // Go the the next empty row.
+    currentcell = voorraadbeheer.getRange(row, 1).getValue();
+  }
+}
+
+// This function uses a trigger to find all product used up and moves the data to a seperate sheet.
+
+function usedUp() {
+
+  let currentcell = voorraadbeheer.getRange(row, 1).getValue();
+
+  // As long as the currentcell is not empty the function goes over the table and will compare each time the expirationdate with the number of days till it expires.
+
+  while ( currentcell != '') {
+    const alreadyused =voorraadbeheer.getRange(row, 11).getValue();
+
+    if ( alreadyused != '' ) {
+      const currentrow = voorraadbeheer.getRange(row, 1, 1, 15);
+      const destRange = opgebruikteReagentia.getRange(opgebruikteReagentia.getLastRow()+1, 1);
+      currentrow.copyTo(destRange, {contentsOnly: false});
+      currentrow.clear();
+    }
+    row = row +1; // ga naar de volgende niet lege rij
+    currentcell = voorraadbeheer.getRange(row, 1).getValue();
+  }
+
+
+  const range = voorraadbeheer.getRange('A3:01100');
+  range.sort(7); // sort the whole range on column 7
 }
 
 
