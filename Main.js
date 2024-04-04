@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable require-jsdoc */
 /* eslint-disable no-unused-vars */
 /* eslint-disable max-len */
@@ -107,7 +108,6 @@ function usedUp() {
   let currentcell = voorraadbeheer.getRange(row, 1).getValue();
 
   // As long as the currentcell is not empty the function goes over the table and will compare each time the expirationdate with the number of days till it expires.
-
   while ( currentcell != '') {
     const alreadyused =voorraadbeheer.getRange(row, 11).getValue();
 
@@ -117,48 +117,158 @@ function usedUp() {
       currentrow.copyTo(destRange, {contentsOnly: false});
       currentrow.clear();
     }
-    row = row +1; // ga naar de volgende niet lege rij
+    row = row +1; // go to the next not empty row
     currentcell = voorraadbeheer.getRange(row, 1).getValue();
   }
 
   maxrange.sort(7); // sort the whole range on column 7
 }
 
-
+// Calculates the total supply of a selected item.
 function totalSupply() {
+  // start of itemarray
+  const itemarr = [['Item name', 'Expiration date ', 'Number of items']];
+  // Get the value of the cell selected in the spreadsheet.
   const selObj = SpreadsheetApp.getActiveSheet().getSelection();
   const selectedText = selObj.getActiveRange().getValue();
+  // Selects the first tab.
   voorraadbeheer.activate();
+  // Get the name of the first item in the list.
   let currentcell = voorraadbeheer.getRange(row, 1).getValue();
-  if (selectedText != '') {
+  if (selectedText != '') { // Gives an error message if not the selected cell is empty.
+  // Initiates values.
     let totalitems = 0;
     let currentitem = 0;
-    Logger.log(totalitems);
-    Logger.log(currentitem);
+    // While the current cell is not empty compare values with the selected text.
     while ( currentcell != '') {
       // eslint-disable-next-line prefer-const
       let itemId =voorraadbeheer.getRange(row, 1).getValue();
-      if ( itemId == selectedText ) {
-        Logger.log(itemId);
+      if ( itemId == selectedText ) { // if the the current cell has the same value the selected text.
         // eslint-disable-next-line prefer-const
-        let maxitem = voorraadbeheer.getRange(row, 4).getValue();
+        // Calculate the current number of items by taking the maxium number of items and subscracting the used items.
+        const maxitem = voorraadbeheer.getRange(row, 4).getValue();
         // eslint-disable-next-line prefer-const
         let useditem = voorraadbeheer.getRange(row, 6).getValue();
         currentitem = maxitem- useditem;
-        Logger.log(currentitem);
-        Logger.log(totalitems);
+        // added the number of used items in this instance to the number of total items.
         totalitems = totalitems + currentitem;
-        Logger.log(totalitems);
+        const arr = []; // Generates a new array and adds the name of the item
+        arr.push(selectedText);
+        // Takes the expirationdate out from the selected line. Transforms it to string then slices the string to keep relevant information.
+        const expirationdate_Obj = voorraadbeheer.getRange(row, 8).getValue();
+        const expirationdate_String= expirationdate_Obj.toString();
+        const expirationdate = expirationdate_String.slice(0, 16);
+        // Adds items to array.
+        arr.push(expirationdate);
+        arr.push(currentitem);
+        // Adds the new array to the existing table.
+        itemarr.push(arr);
       }
-      row = row +1; // ga naar de volgende niet lege rij
+      row = row +1; // go to the next line.
       currentcell = voorraadbeheer.getRange(row, 1).getValue();
     }
-    SpreadsheetApp.getUi().alert('The total number of item '+selectedText+' is: '+ totalitems);
-  } else {
+    // This function take a name of an item, a number of item in total and an array to construct a table.
+    createDoc(selectedText, totalitems, itemarr);
+  } else { // Gives an error message if not the selected cell is empty.
     SpreadsheetApp.getUi().alert('Select the item you want to check the inventory for out of the list of in the minimum voorraad tab. Then run the function again.');
   }
 }
+// This function take a name of an item, a number of item in total and an array to construct a table.
+function createDoc(itemname, totalitems, itemarr) {
+  // style of the title
+  const titleStyle = {};
+  titleStyle[DocumentApp.Attribute.HORIZONTAL_ALIGNMENT] =
+    DocumentApp.HorizontalAlignment.CENTER;
+  titleStyle[DocumentApp.Attribute.FONT_FAMILY] = 'Calibri';
+  titleStyle[DocumentApp.Attribute.FONT_SIZE] = 20;
+  titleStyle[DocumentApp.Attribute.BOLD] = true;
+  // style of the basic text
+  const textStyle = {};
+  textStyle[DocumentApp.Attribute.HORIZONTAL_ALIGNMENT] =
+    DocumentApp.HorizontalAlignment.LEFT;
+  textStyle[DocumentApp.Attribute.FONT_FAMILY] = 'Calibri';
+  textStyle[DocumentApp.Attribute.FONT_SIZE] = 12;
+  textStyle[DocumentApp.Attribute.BOLD] = false;
+  // style of the solution text
+  const solutionStyle = {};
+  solutionStyle[DocumentApp.Attribute.HORIZONTAL_ALIGNMENT] =
+    DocumentApp.HorizontalAlignment.CENTER;
+  solutionStyle[DocumentApp.Attribute.FONT_FAMILY] = 'Calibri';
+  solutionStyle[DocumentApp.Attribute.FONT_SIZE] = 14;
+  solutionStyle[DocumentApp.Attribute.BOLD] = true;
+  solutionStyle[DocumentApp.Attribute.UNDERLINE] = true;
+  // style of the table
+  const tableStyle = {};
+  tableStyle[DocumentApp.Attribute.HORIZONTAL_ALIGNMENT] =
+    DocumentApp.HorizontalAlignment.CENTER;
+  tableStyle[DocumentApp.Attribute.FONT_FAMILY] = 'Calibri';
+  tableStyle[DocumentApp.Attribute.FONT_SIZE] = 12;
+  tableStyle[DocumentApp.Attribute.BOLD] = false;
+  solutionStyle[DocumentApp.Attribute.UNDERLINE] = false;
 
+  // Generates the time from google
+  let time = new Date();
+  time = Utilities.formatDate(time, 'GMT+02:00', 'dd/MM/yy HH:mm');
+
+  // Generate the name of the document and get the ID
+  const newdoc= DocumentApp.create('Item rapport : '+itemname+' '+ time);
+  const docid= newdoc.getId();
+  // Open a document by ID.
+  const doc = DocumentApp.openById(docid);
+  const body = doc.getBody();
+
+  // Append a paragraph to the document body section directly.
+  const title =body.appendParagraph(itemname);
+  // Apply the custom style.
+  title.setAttributes(titleStyle);
+  // Creates a horizontal line.
+  body.appendHorizontalRule();
+  // Generates and adds the main body of text
+  const standardtext= body.appendParagraph('This document was automatically generated and uses the data of 2024-Voorraadbeheer to calculate the quantity of the requested product. This rapport was generated on '+time+'.');
+  // Apply the custom style.
+  standardtext.setAttributes(textStyle);
+  // Creates a paragraph break.
+  body.appendParagraph('');
+  // Generates and adds the solution line.
+  const solution =body.appendParagraph('The total number of times item '+itemname+' is available is '+ totalitems+'.');
+  // Apply the custom style.
+  solution.setAttributes(solutionStyle);
+
+  // Build a table from the array.
+  const table =body.appendTable(itemarr);
+  // Apply the custom style.
+  table.setAttributes(tableStyle);
+  // Searches a file in the drive, check to see if the given foldername exist in the drive, if not the scipt creates it, then moves the file in the folder.
+  moveFile('Item rapports automatically generated', docid);
+}
+
+
+// Searches a file in the drive, check to see if the given foldername exist in the drive, if not the script creates it, then moves the file in the folder.
+function moveFile(name_Of_Destination, id_Of_File) {
+  let folderpresent = false; // initiates parameter to check if folder is available
+  let folderid = ''; // initiates the ID string for the folder
+
+  const folders = DriveApp.getFolders(); // gets all folder form the users drive
+
+  // loops over all folders and compares the name to the name given given as the first param
+  while (folders.hasNext()) {
+    const folder = folders.next();
+    const foldername = folder.getName();
+
+    if (foldername === name_Of_Destination) {
+    // if the folder is present,change folderpresent too true and get the id
+      folderpresent = true;
+      folderid = folder.getId();
+    }
+  }
+  // if the folder does not exist create the folder and get the ID
+  if (folderpresent === false) {
+    folderid = DriveApp.createFolder(name_Of_Destination).getId();
+  }
+  // get the folder and move file to folder.
+  const correctfolder = DriveApp.getFolderById(folderid);
+  DriveApp.getFileById(id_Of_File).moveTo(correctfolder);
+}
 
 function onEdit(e) {
   // declaration
@@ -189,3 +299,5 @@ function onEdit(e) {
     }
   }
 }
+
+
