@@ -267,7 +267,6 @@ function averageOrderTime() {
 
 
   const allCharts =configuration.getCharts(); // Select all charts in the tab configuration and removes them.
-
   for (const i in allCharts) {
     const chart = allCharts[i];
     configuration.removeChart(chart);

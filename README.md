@@ -1,36 +1,41 @@
-# <Inventory management system>
+# Inventory management system
 
 ## Description
 
-The goal of the project was to create a semi-automatic Inventory management system. 
-The application was tailor made for the anatomo-pathologic lab of AZ Zeno.
+The goal of the project is to create a semi-automatic Inventory management system by using an Google spreadsheet with add-on programming.
+The application was tailor made for the anatomo-pathologic lab of AZ Zeno. The application was writen in JavaScript.
 Yoram Vandenhouwe was the main contributor of this project.
-Work on the project started on 13/02/2024.
+Work on the project started on 13/02/2024. The Inventory management system was diliverd to the anatomo-pathologic lab of AZ Zeno on 14/05/2024.
 
-## Installation
+## Development stetup
 
-What are the steps required to install your project? Provide a step-by-step description of how to get the development environment running.
+The code may be downloaded. Work on the code can be done in the IDE of the users chosing. 
+
+The code is used in Google Apps Script in a spreadsheet.
+https://www.google.com/script/start/
+
+Visual studio code was used to develop the project.
+https://code.visualstudio.com/
+
+Eslint was used to help with the coding of the JavaScript.
+https://eslint.org/
+
+Clasp was used to transfer the code from Visual studio code too Google Apps Script.
+https://github.com/google/clasp
+
+## Instalation
+
+Download the spreadsheet and open the file with Google Spreadsheet. Load the code in the spreadsheet with Clasp ( or paste it in the Google Script App).
+Install the time triggers, see manual. For further information consult the manual.
 
 ## Usage
+    
+A manual is provided for a full explanation. The manual is in dutch.
 
-Provide instructions and examples for use. Include screenshots as needed.
-
-To add a screenshot, create an `assets/images` folder in your repository and upload your screenshot to it. Then, using the relative filepath, add it to your README using the following syntax:
-
-    ```md
-    ![alt text](assets/images/screenshot.png)
-    ```
-
-## Features
-
-If your project has a lot of features, list them here.
-
----
 ## Credits
 
-The project was realized with the help of ir Rob Vanden Broucke and Dr B.Lelie
+The project was realized with the help of ir Rob Vanden Broucke and Dr B.Lelie who, respectivly, guided with the coding and to functionality of the project.
 
-For the project GitHub desktop, Google App Scripts, Visual Studio Code, Eslint and Clasp.
 
 ## Template for README
 Free-to-use template provided by link below:
