@@ -506,8 +506,8 @@ function makeYearRapport() {
     const ui = SpreadsheetApp.getUi();
     const response = ui.prompt('Jaar van het rapport', 'Vul een datum in tussen 2000 en 2100.', ui.ButtonSet.YES_NO); // Give a prompt to
     // Process the user's response.
-    const givenYearDateString=response.getResponseText();
-    const givenYearDate = Number(givenYearDateString);
+    let givenYearDateString=response.getResponseText();
+    let givenYearDate = Number(givenYearDateString);
     if (response.getSelectedButton() == ui.Button.YES) { // If they click yes execute the code below.
       if (givenYearDate >= 2100 || givenYearDate <= 2000) { // Check if the date is in the yyyy format and is a possible date.
         SpreadsheetApp.getUi().alert('The year needs to be between 2000 and 2100.'); // Give the user an errormessage to give a correct date.
